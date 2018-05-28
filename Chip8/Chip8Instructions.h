@@ -167,7 +167,10 @@ void _FX0A(unsigned short opcode, Chip8Memory *memory)
 
 void _FX15(unsigned short opcode, Chip8Memory *memory)
 {
-    //TODO
+    unsigned short reg = opcode & 0xF00;
+    memory->delay_timer = memory->registers[reg];
+
+    memory->program_counter += 2;
 }
 
 void _FX18(unsigned short opcode, Chip8Memory *memory)
