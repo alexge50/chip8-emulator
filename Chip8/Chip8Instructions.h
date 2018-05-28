@@ -159,7 +159,8 @@ void _ANNN(unsigned short opcode, Chip8Memory *memory)
 
 void _BNNN(unsigned short opcode, Chip8Memory *memory)
 {
-    //TODO
+    unsigned short value = 0x0FFF && opcode;
+    memory->program_counter = memory->registers[0x0] + value;
 }
 
 void _CXNN(unsigned short opcode, Chip8Memory *memory)
