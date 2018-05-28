@@ -21,5 +21,9 @@
 
 int main()
 {
+    Chip8 chip8;
+
+    chip8.Initialize();
+
     return 0;
 }

@@ -28,7 +28,11 @@ void _0NNN(unsigned short opcode, Chip8Memory *memory)
 
 void _00E0(unsigned short opcode, Chip8Memory *memory)
 {
-    //TODO
+    for(int i = 0; i < CHIP8_HEIGHT; i++)
+        for(int j = 0; j < CHIP8_WIDTH; j++)
+            memory->graphics_memory[i][j] = 0;
+
+    memory->program_counter += 2;
 }
 
 void _00EE(unsigned short opcode, Chip8Memory *memory)
