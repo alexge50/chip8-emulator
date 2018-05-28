@@ -229,7 +229,14 @@ void _FX33(unsigned short opcode, Chip8Memory *memory)
 
 void _FX55(unsigned short opcode, Chip8Memory *memory)
 {
-    //TODO
+    unsigned short reg = 0x0F00 & opcode;
+    for(int i = 0; i < reg; i++)
+    {
+        memory->memory[memory->index] = memory->registers[i];
+        memory->index ++;
+    }
+
+    memory->program_counter += 2;
 }
 
 void _FX65(unsigned short opcode, Chip8Memory *memory)
