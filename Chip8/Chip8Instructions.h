@@ -67,7 +67,11 @@ void _5XY0(unsigned short opcode, Chip8Memory *memory)
 
 void _6XNN(unsigned short opcode, Chip8Memory *memory)
 {
-    //TODO
+    unsigned short reg = opcode & 0xF00;
+    unsigned short value = opcode & 0x00FF;
+    memory->registers[reg] = static_cast<unsigned char>(0xFF & value);
+
+    memory->program_counter += 2;
 }
 
 void _7XNN(unsigned short opcode, Chip8Memory *memory)
