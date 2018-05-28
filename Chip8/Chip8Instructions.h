@@ -151,7 +151,10 @@ void _9XY0(unsigned short opcode, Chip8Memory *memory)
 
 void _ANNN(unsigned short opcode, Chip8Memory *memory)
 {
-    //TODO
+    unsigned short value = 0x0FFF & opcode;
+    memory->index = value;
+
+    memory->program_counter += 2;
 }
 
 void _BNNN(unsigned short opcode, Chip8Memory *memory)
