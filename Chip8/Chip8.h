@@ -19,6 +19,8 @@
 #ifndef CHIP8_EMULATOR_CHIP8_H
 #define CHIP8_EMULATOR_CHIP8_H
 
+const int CHIP8_NUMBER_OPCODES = 35;
+
 struct Chip8Memory
 {
     unsigned char memory[4096];
@@ -36,6 +38,13 @@ struct Chip8Memory
     unsigned char key[16];
 };
 
+typedef void(*InstructionCallback)(unsigned short, Chip8Memory*);
+struct Chip8Instruction
+{
+    unsigned short mask, value;
+    InstructionCallback instruction_callback;
+};
+
 class Chip8 {
 public:
     void Initialize();
@@ -43,7 +52,7 @@ public:
 
 private:
     Chip8Memory memory;
+    Chip8Instruction instructionTable[CHIP8_NUMBER_OPCODES];
 };
-
 
 #endif //CHIP8_EMULATOR_CHIP8_H

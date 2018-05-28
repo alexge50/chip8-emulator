@@ -3,4 +3,4 @@ project(chip8-emulator)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(chip8-emulator main.cpp main.cpp Chip8/Chip8.cpp Chip8/Chip8.h)
+add_executable(chip8-emulator main.cpp main.cpp Chip8/Chip8.cpp Chip8/Chip8.h Chip8/Chip8Instructions.h)
