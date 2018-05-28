@@ -20,22 +20,28 @@
 #define CHIP8_EMULATOR_CHIP8_H
 
 const int CHIP8_NUMBER_OPCODES = 35;
+const int CHIP8_WIDTH = 64;
+const int CHIP8_HEIGHT = 32;
+const int CHIP8_MEMORY = 4096;
+const int CHIP8_REGISTERS = 16;
+const int CHIP8_STACK_SIZE = 16;
+const int CHIP8_KEYS = 16;
 
 struct Chip8Memory
 {
-    unsigned char memory[4096];
-    unsigned char registers[16];
+    unsigned char memory[CHIP8_MEMORY];
+    unsigned char registers[CHIP8_REGISTERS];
 
     unsigned short index, program_counter;
 
-    unsigned char graphics_memory[32][64];
+    unsigned char graphics_memory[CHIP8_HEIGHT][CHIP8_WIDTH];
 
     unsigned char delay_timer, sound_timer;
 
-    unsigned short stack[16];
+    unsigned short stack[CHIP8_STACK_SIZE];
     unsigned short stack_pointer;
 
-    unsigned char key[16];
+    unsigned char key[CHIP8_KEYS];
 };
 
 typedef void(*InstructionCallback)(unsigned short, Chip8Memory*);
