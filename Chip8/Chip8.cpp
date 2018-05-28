@@ -17,3 +17,11 @@
  */
 
 #include "Chip8.h"
+
+void Chip8::Initialize() {
+
+}
+
+void Chip8::EmulateCycle() {
+
+}

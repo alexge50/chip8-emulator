@@ -19,10 +19,30 @@
 #ifndef CHIP8_EMULATOR_CHIP8_H
 #define CHIP8_EMULATOR_CHIP8_H
 
+struct Chip8Memory
+{
+    unsigned char memory[4096];
+    unsigned char registers[16];
 
+    unsigned short index, program_counter;
+
+    unsigned char graphics_memory[32][64];
+
+    unsigned char delay_timer, sound_timer;
+
+    unsigned short stack[16];
+    unsigned short stack_pointer;
+
+    unsigned char key[16];
+};
 
 class Chip8 {
+public:
+    void Initialize();
+    void EmulateCycle();
 
+private:
+    Chip8Memory memory;
 };
 
 
