@@ -188,7 +188,13 @@ void _8XY7(unsigned short opcode, Chip8Memory *memory)
 
 void _8XYE(unsigned short opcode, Chip8Memory *memory)
 {
-    //TODO
+    unsigned short reg_x = opcode & 0x0F00;
+    unsigned short reg_y = opcode & 0x00F0;
+
+    memory->registers[0xF] = memory->memory[reg_y] & 0b10000000;
+    memory->registers[reg_x] = memory->memory[reg_y] << 1;
+
+    memory->program_counter += 2;
 }
 
 void _9XY0(unsigned short opcode, Chip8Memory *memory)
