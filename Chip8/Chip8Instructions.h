@@ -287,7 +287,18 @@ void _FX07(unsigned short opcode, Chip8Memory *memory)
 
 void _FX0A(unsigned short opcode, Chip8Memory *memory)
 {
-    //TODO
+    unsigned short reg = opcode & 0xF00;
+
+    int key = -1;
+    for(int i = 0; i < CHIP8_KEYS; i++)
+        if(memory->key[i])
+            key = i;
+
+    if(key != - 1)
+    {
+        memory->registers[reg] = key;
+        memory->program_counter += 2;
+    }
 }
 
 void _FX15(unsigned short opcode, Chip8Memory *memory)
