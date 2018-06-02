@@ -63,7 +63,12 @@ void _4XNN(unsigned short opcode, Chip8Memory *memory)
 
 void _5XY0(unsigned short opcode, Chip8Memory *memory)
 {
-    //TODO
+    unsigned short reg_x = opcode & 0x0F00;
+    unsigned short reg_y = opcode & 0x00F0;
+
+    if(memory->registers[reg_x] == memory->registers[reg_y])
+        memory->program_counter += 4;
+    else memory->program_counter += 2;
 }
 
 void _6XNN(unsigned short opcode, Chip8Memory *memory)
