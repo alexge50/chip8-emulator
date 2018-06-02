@@ -270,7 +270,11 @@ void _EX9E(unsigned short opcode, Chip8Memory *memory)
 
 void _EXA1(unsigned short opcode, Chip8Memory *memory)
 {
-    //TODO
+    unsigned short reg = opcode & 0x0F00;
+
+    if(!memory->key[memory->registers[reg]])
+        memory->program_counter += 4;
+    else memory->program_counter += 2;
 }
 
 void _FX07(unsigned short opcode, Chip8Memory *memory)
