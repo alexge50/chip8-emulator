@@ -38,7 +38,11 @@ void _00E0(unsigned short opcode, Chip8Memory *memory)
 
 void _00EE(unsigned short opcode, Chip8Memory *memory)
 {
-    //TODO
+    if(memory->stack_pointer > 0)
+    {
+        memory->program_counter = memory->stack[memory->stack_pointer - 1];
+        memory->stack_pointer --;
+    }
 }
 
 void _1NNN(unsigned short opcode, Chip8Memory *memory)
