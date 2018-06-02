@@ -65,3 +65,13 @@ void Chip8::EmulateCycle()
         if(opcode & instructionTable[i].mask == instructionTable[i].value)
             instructionTable[i].instruction_callback(opcode, &memory);
 }
+
+unsigned char Chip8::GetPixel(int line, int column)
+{
+    return memory.graphics_memory[line % CHIP8_HEIGHT][column % CHIP8_WIDTH];
+}
+
+void Chip8::SetKey(int key)
+{
+    memory.key[key % 16] = 1;
+}

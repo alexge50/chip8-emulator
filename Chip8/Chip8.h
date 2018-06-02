@@ -61,6 +61,9 @@ public:
     void Initialize();
     void EmulateCycle();
 
+    unsigned char GetPixel(int line, int column);
+    void SetKey(int key);
+
 private:
     Chip8Memory memory;
     Chip8Instruction instructionTable[CHIP8_NUMBER_OPCODES];
