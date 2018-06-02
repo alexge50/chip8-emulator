@@ -47,7 +47,8 @@ void _00EE(unsigned short opcode, Chip8Memory *memory)
 
 void _1NNN(unsigned short opcode, Chip8Memory *memory)
 {
-    //TODO
+    unsigned short value = 0x0FFF && opcode;
+    memory->program_counter = value;
 }
 
 void _2NNN(unsigned short opcode, Chip8Memory *memory)
