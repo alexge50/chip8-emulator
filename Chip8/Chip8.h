@@ -29,6 +29,8 @@ const int CHIP8_KEYS = 16;
 
 const int CHIP8_FONTSET_OFFSET = 0x0; //fontset starts in memory from 0
 const int CHIP8_SPRITE_WIDTH = 8;
+const int CHIP8_MAX_VALUE = 255;
+const int CHIP8_MIN_VALUE = 0;
 
 struct Chip8Memory
 {
