@@ -147,7 +147,12 @@ void _8XYE(unsigned short opcode, Chip8Memory *memory)
 
 void _9XY0(unsigned short opcode, Chip8Memory *memory)
 {
-    //TODO
+    unsigned short reg_x = opcode & 0x0F00;
+    unsigned short reg_y = opcode & 0x00F0;
+
+    if(memory->registers[reg_x] != memory->registers[reg_y])
+        memory->program_counter += 4;
+    else memory->program_counter += 2;
 }
 
 void _ANNN(unsigned short opcode, Chip8Memory *memory)
