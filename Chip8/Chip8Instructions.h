@@ -52,7 +52,13 @@ void _1NNN(unsigned short opcode, Chip8Memory *memory)
 
 void _2NNN(unsigned short opcode, Chip8Memory *memory)
 {
-    //TODO
+    if(memory->stack_pointer < CHIP8_STACK_SIZE)
+    {
+        memory->stack[memory->stack_pointer] = memory->program_counter;
+        memory->stack_pointer ++;
+
+        memory->program_counter = opcode & 0xFFF;
+    }
 }
 
 void _3XNN(unsigned short opcode, Chip8Memory *memory)
