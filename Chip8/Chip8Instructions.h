@@ -224,7 +224,15 @@ void _FX29(unsigned short opcode, Chip8Memory *memory)
 
 void _FX33(unsigned short opcode, Chip8Memory *memory)
 {
-    //TODO
+    unsigned char value = memory->registers[opcode & 0x0F00];
+
+    for(int i = 2; i >= 0; i--)
+    {
+        memory->memory[memory->index + i] = static_cast<unsigned char>(value % 10);
+        value /= 10;
+    }
+
+    memory->program_counter += 2;
 }
 
 void _FX55(unsigned short opcode, Chip8Memory *memory)
