@@ -219,7 +219,10 @@ void _FX1E(unsigned short opcode, Chip8Memory *memory)
 
 void _FX29(unsigned short opcode, Chip8Memory *memory)
 {
-    //TODO
+    unsigned short reg = opcode & 0xF00;
+    memory->index = static_cast<unsigned short>(CHIP8_FONTSET_OFFSET + memory->registers[reg] & 0xF);
+
+    memory->program_counter += 2;
 }
 
 void _FX33(unsigned short opcode, Chip8Memory *memory)
