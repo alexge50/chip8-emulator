@@ -170,7 +170,23 @@ void _CXNN(unsigned short opcode, Chip8Memory *memory)
 
 void _DXYN(unsigned short opcode, Chip8Memory *memory)
 {
-    //TODO
+    unsigned short reg_x = opcode & 0x0F00;
+    unsigned short reg_y = opcode & 0x00F0;
+    unsigned short height = opcode & 0x000F;
+
+    unsigned short vx = memory->registers[reg_x];
+    unsigned short vy = memory->registers[reg_y];
+
+    for(int i = 0; i < height; i++)
+        for(int j = 0; j < CHIP8_SPRITE_WIDTH; j++)
+        {
+            int offset = i * CHIP8_SPRITE_WIDTH + j;
+
+            memory->graphics_memory[i + vy][j + vx] ^= memory->memory[memory->index + offset];
+        }
+
+
+    memory->program_counter += 2;
 }
 
 void _EX9E(unsigned short opcode, Chip8Memory *memory)

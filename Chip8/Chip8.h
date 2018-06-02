@@ -27,7 +27,8 @@ const int CHIP8_REGISTERS = 16;
 const int CHIP8_STACK_SIZE = 16;
 const int CHIP8_KEYS = 16;
 
-const int CHIP8_FONTSET_OFFSET = 0x0; //fontset starts in memory from 0.
+const int CHIP8_FONTSET_OFFSET = 0x0; //fontset starts in memory from 0
+const int CHIP8_SPRITE_WIDTH = 8;
 
 struct Chip8Memory
 {
