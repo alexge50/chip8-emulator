@@ -19,6 +19,7 @@
 #ifndef CHIP8_EMULATOR_CHIP8INSTRUCTIONS_H
 #define CHIP8_EMULATOR_CHIP8INSTRUCTIONS_H
 
+#include <cstdlib>
 #include "Chip8.h"
 
 void _0NNN(unsigned short opcode, Chip8Memory *memory)
@@ -165,7 +166,12 @@ void _BNNN(unsigned short opcode, Chip8Memory *memory)
 
 void _CXNN(unsigned short opcode, Chip8Memory *memory)
 {
-    //TODO
+    unsigned short reg = opcode & 0x0F00;
+    unsigned short value = opcode & 0x00FF;
+
+    memory->registers[reg] = rand() & value;
+
+    memory->program_counter += 2;
 }
 
 void _DXYN(unsigned short opcode, Chip8Memory *memory)
