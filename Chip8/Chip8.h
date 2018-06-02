@@ -19,6 +19,8 @@
 #ifndef CHIP8_EMULATOR_CHIP8_H
 #define CHIP8_EMULATOR_CHIP8_H
 
+#include <cstdint>
+
 const int CHIP8_NUMBER_OPCODES = 35;
 const int CHIP8_WIDTH = 64;
 const int CHIP8_HEIGHT = 32;
@@ -34,25 +36,25 @@ const int CHIP8_MIN_VALUE = 0;
 
 struct Chip8Memory
 {
-    unsigned char memory[CHIP8_MEMORY];
-    unsigned char registers[CHIP8_REGISTERS];
+    uint8_t memory[CHIP8_MEMORY];
+    uint8_t registers[CHIP8_REGISTERS];
 
-    unsigned short index, program_counter;
+    uint16_t index, program_counter;
 
-    unsigned char graphics_memory[CHIP8_HEIGHT][CHIP8_WIDTH];
+    uint8_t graphics_memory[CHIP8_HEIGHT][CHIP8_WIDTH];
 
-    unsigned char delay_timer, sound_timer;
+    uint8_t delay_timer, sound_timer;
 
-    unsigned short stack[CHIP8_STACK_SIZE];
-    unsigned short stack_pointer;
+    uint16_t stack[CHIP8_STACK_SIZE];
+    uint16_t stack_pointer;
 
-    unsigned char key[CHIP8_KEYS];
+    uint8_t key[CHIP8_KEYS];
 };
 
-typedef void(*InstructionCallback)(unsigned short, Chip8Memory*);
+typedef void(*InstructionCallback)(uint16_t, Chip8Memory*);
 struct Chip8Instruction
 {
-    unsigned short mask, value;
+    uint16_t mask, value;
     InstructionCallback instruction_callback;
 };
 
@@ -61,7 +63,7 @@ public:
     void Initialize();
     void EmulateCycle();
 
-    unsigned char GetPixel(int line, int column);
+    uint8_t GetPixel(int line, int column);
     void SetKey(int key);
 
 private:

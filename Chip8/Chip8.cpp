@@ -59,14 +59,14 @@ void Chip8::Initialize() {
 
 void Chip8::EmulateCycle()
 {
-    unsigned short opcode = memory.memory[memory.program_counter] << 8 + memory.memory[memory.program_counter + 1];
+    uint16_t opcode = memory.memory[memory.program_counter] << 8 + memory.memory[memory.program_counter + 1];
 
     for(int i = 0; i < CHIP8_NUMBER_OPCODES; i++)
         if(opcode & instructionTable[i].mask == instructionTable[i].value)
             instructionTable[i].instruction_callback(opcode, &memory);
 }
 
-unsigned char Chip8::GetPixel(int line, int column)
+uint8_t Chip8::GetPixel(int line, int column)
 {
     return memory.graphics_memory[line % CHIP8_HEIGHT][column % CHIP8_WIDTH];
 }
