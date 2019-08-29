@@ -21,6 +21,9 @@
 #include <SFML/Graphics.hpp>
 
 #include <iostream>
+#include <fstream>
+#include <unordered_map>
+#include <thread>
 
 void logMemory(const Chip8& chip8, const char* file)
 {
@@ -48,7 +51,9 @@ static const std::unordered_map<sf::Keyboard::Key, uint8_t> inputMapping = {
 
 int main()
 {
-    Chip8 chip8 = loadRom("roms/BREAKOUT.ch8");
+    Chip8 chip8;
+    loadRom(chip8, "roms/BREAKOUT.ch8");
+
     uint32_t graphics_buffer[CHIP8_HEIGHT][CHIP8_WIDTH];
 
     sf::RenderWindow window(
@@ -60,7 +65,20 @@ int main()
     sf::Texture screen{};
     screen.create(CHIP8_WIDTH, CHIP8_HEIGHT);
 
-    int frame = 0;
+    sf::Clock clock;
+
+    std::atomic<bool> exit = false;
+    std::thread timer([&chip8, &exit]
+    {
+        while(!exit)
+        {
+            using namespace std::chrono_literals;
+
+            tick_timer(chip8);
+            std::this_thread::sleep_for(0.016s);
+        }
+    });
+
     while (window.isOpen())
     {
         sf::Event event{};
@@ -81,26 +99,31 @@ int main()
             }
         }
 
-        std::cout << std::hex << chip8.program_counter << std::dec << ": " << decode_next_instruction(chip8) << std::endl;
-        tick(chip8);
-
-        for(int i = 0; i < CHIP8_HEIGHT; i++)
+        if (clock.getElapsedTime().asMilliseconds() >= 2)
         {
-            for(int j = 0; j < CHIP8_WIDTH; j++)
-                graphics_buffer[i][j] = 0xffffffffu * (chip8.graphics_memory[i][j] != 0);
+            tick(chip8);
+
+            for (int i = 0; i < CHIP8_HEIGHT; i++)
+            {
+                for (int j = 0; j < CHIP8_WIDTH; j++)
+                    graphics_buffer[i][j] = 0xffffff00u * (chip8.graphics_memory[i][j] != 0) + 0xffu;
+            }
+
+            screen.update(reinterpret_cast<uint8_t *>(graphics_buffer));
+
+            auto sprite = sf::Sprite(screen);
+            sprite.scale({10.f, 10.f});
+
+            window.clear();
+            window.draw(sprite);
+            window.display();
+
+            clock.restart();
         }
-
-        screen.update(reinterpret_cast<uint8_t*>(graphics_buffer));
-
-        auto sprite = sf::Sprite(screen);
-        sprite.scale({10.f, 10.f});
-
-        window.draw(sprite);
-        window.display();
-
-        //logMemory(chip8, ("debug/" + std::to_string(frame++)).c_str());
     }
 
+    exit = true;
+    timer.join();
 
     return 0;
 }
