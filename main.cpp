@@ -16,14 +16,62 @@
  * SOFTWARE.
  */
 
-#include <stdio.h>
 #include "Chip8/Chip8.h"
+#include "Chip8/Chip8Debug.h"
+#include <SFML/Graphics.hpp>
+
+#include <iostream>
+
+void logMemory(const Chip8& chip8, const char* file)
+{
+    std::ofstream log{file};
+    log.write(reinterpret_cast<const char*>(chip8.memory), 0xfff);
+}
 
 int main()
 {
-    Chip8 chip8;
+    Chip8 chip8 = loadRom("roms/BREAKOUT.ch8");
+    uint32_t graphics_buffer[CHIP8_HEIGHT][CHIP8_WIDTH];
 
-    chip8.Initialize();
+    sf::RenderWindow window(
+            sf::VideoMode(
+                    CHIP8_WIDTH * 10,
+                    CHIP8_HEIGHT * 10),
+            "Chip8 by alexge50");
+
+    sf::Texture screen{};
+    screen.create(CHIP8_WIDTH, CHIP8_HEIGHT);
+
+    int frame = 0;
+    while (window.isOpen())
+    {
+        sf::Event event{};
+        while (window.pollEvent(event))
+        {
+            if (event.type == sf::Event::Closed)
+                window.close();
+        }
+
+        std::cout << std::hex << chip8.program_counter << std::dec << ": " << decode_next_instruction(chip8) << std::endl;
+        tick(chip8);
+
+        for(int i = 0; i < CHIP8_HEIGHT; i++)
+        {
+            for(int j = 0; j < CHIP8_WIDTH; j++)
+                graphics_buffer[i][j] = 0xffffffffu * (chip8.graphics_memory[i][j] != 0);
+        }
+
+        screen.update(reinterpret_cast<uint8_t*>(graphics_buffer));
+
+        auto sprite = sf::Sprite(screen);
+        sprite.scale({10.f, 10.f});
+
+        window.draw(sprite);
+        window.display();
+
+        //logMemory(chip8, ("debug/" + std::to_string(frame++)).c_str());
+    }
+
 
     return 0;
 }
