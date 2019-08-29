@@ -26,18 +26,18 @@
 
 #include "Chip8Instructions.h"
 
-const int CHIP8_NUMBER_OPCODES = 35;
-const int CHIP8_WIDTH = 64;
-const int CHIP8_HEIGHT = 32;
-const int CHIP8_MEMORY = 4096;
-const int CHIP8_REGISTERS = 16;
-const int CHIP8_STACK_SIZE = 16;
-const int CHIP8_KEYS = 16;
+const unsigned int CHIP8_NUMBER_OPCODES = 35;
+const unsigned int CHIP8_WIDTH = 64;
+const unsigned int CHIP8_HEIGHT = 32;
+const unsigned int CHIP8_MEMORY = 4096;
+const unsigned int CHIP8_REGISTERS = 16;
+const unsigned int CHIP8_STACK_SIZE = 16;
+const unsigned int CHIP8_KEYS = 16;
 
-const int CHIP8_FONTSET_OFFSET = 0x0; //fontset starts in memory from 0
-const int CHIP8_SPRITE_WIDTH = 8;
-const int CHIP8_MAX_VALUE = 255;
-const int CHIP8_MIN_VALUE = 0;
+const unsigned int CHIP8_FONTSET_OFFSET = 0x0; //fontset starts in memory from 0
+const unsigned int CHIP8_SPRITE_WIDTH = 8;
+const unsigned int CHIP8_MAX_VALUE = 255;
+const unsigned int CHIP8_MIN_VALUE = 0;
 
 class Chip8;
 
