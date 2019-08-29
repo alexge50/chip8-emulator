@@ -25,6 +25,8 @@
 #include <vector>
 #include <atomic>
 
+#include <emmintrin.h>
+
 #include "Chip8Instructions.h"
 
 const unsigned int CHIP8_NUMBER_OPCODES = 35;
@@ -89,6 +91,83 @@ const InstructionEntry instructionTable[] =
         {0xF0FF, 0xF065, _FX65},
 };
 
+alignas(16) static uint16_t instructionMasks[] =
+{
+        0xFFFF,
+        0xFFFF,
+        0xF000,
+        0xF000,
+        0xF000,
+        0xF000,
+        0xF00F,
+        0xF000,
+        0xF000,
+        0xF00F,
+        0xF00F,
+        0xF00F,
+        0xF00F,
+        0xF00F,
+        0xF00F,
+        0xF00F,
+        0xF00F,
+        0xF00F,
+        0xF00F,
+        0xF000,
+        0xF000,
+        0xF000,
+        0xF000,
+        0xF0FF,
+        0xF0FF,
+        0xF0FF,
+        0xF0FF,
+        0xF0FF,
+        0xF0FF,
+        0xF0FF,
+        0xF0FF,
+        0xF0FF,
+        0xF0FF,
+        0xF0FF,
+};
+
+alignas(16) static uint16_t instructionValues[] =
+{
+        0x00E0,
+        0x00EE,
+        0x1000,
+        0x2000,
+        0x3000,
+        0x4000,
+        0x5000,
+        0x6000,
+        0x7000,
+        0x8000,
+        0x8001,
+        0x8002,
+        0x8003,
+        0x8004,
+        0x8005,
+        0x8006,
+        0x8007,
+        0x800E,
+        0x9000,
+        0xA000,
+        0xB000,
+        0xC000,
+        0xD000,
+        0xE09E,
+        0xE0A1,
+        0xF007,
+        0xF00A,
+        0xF015,
+        0xF018,
+        0xF01E,
+        0xF029,
+        0xF033,
+        0xF055,
+        0xF065,
+};
+
+
 using Instruction = std::uint16_t;
 
 struct Chip8
@@ -131,9 +210,28 @@ static void tick(Chip8& chip)
 {
     uint16_t opcode = (chip.memory[chip.program_counter] << 8u) + chip.memory[chip.program_counter + 1];
 
-    for(const auto& instruction: instructionTable)
-        if((opcode & instruction.mask) == instruction.value)
-            instruction.instruction_callback(opcode, chip);
+    auto opcodes =  _mm_set1_epi16(opcode);
+
+    for(int i = 0; i < 4; i++)
+    {
+        __m128i r = _mm_and_si128(*(__m128i*)(instructionMasks + i * 8), opcodes);
+        r = _mm_cmpeq_epi16(r, *(__m128i*)(instructionValues + i * 8));
+        int x = _mm_movemask_epi8(r);
+
+        if(x != 0)
+        {
+            instructionTable[i * 8 + __builtin_ctz(x) / 2].instruction_callback(opcode, chip);
+            return;
+        }
+
+    }
+
+    for(int i = 32; i < 34; i++)
+        if((opcode & instructionMasks[i]) == instructionValues[i])
+        {
+            instructionTable[i].instruction_callback(opcode, chip);
+            return;
+        }
 }
 
 static void tick_timer(Chip8& chip)
