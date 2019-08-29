@@ -6,7 +6,8 @@ set(CMAKE_CXX_STANDARD 17)
 add_library(chip8 STATIC Chip8/Chip8.h Chip8/Chip8Instructions.h Chip8/Chip8Instructions.cpp)
 
 find_package(SFML COMPONENTS graphics REQUIRED)
+find_package(Threads REQUIRED)
 
 add_executable(chip8-emulator main.cpp)
 target_link_libraries(chip8-emulator chip8)
-target_link_libraries(chip8-emulator sfml-graphics)
+target_link_libraries(chip8-emulator sfml-graphics Threads::Threads)
