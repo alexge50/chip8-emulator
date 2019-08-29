@@ -105,7 +105,7 @@ struct Chip8
     uint16_t stack[CHIP8_STACK_SIZE] = {};
     uint16_t stack_pointer = {};
 
-    uint8_t key[CHIP8_KEYS] = {};
+    std::atomic<uint8_t> key[CHIP8_KEYS] = {};
 };
 
 static uint8_t font_data[] = {

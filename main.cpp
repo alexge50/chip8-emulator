@@ -25,6 +25,8 @@
 #include <unordered_map>
 #include <thread>
 
+#include <chrono>
+
 void logMemory(const Chip8& chip8, const char* file)
 {
     std::ofstream log{file};
@@ -65,8 +67,6 @@ int main()
     sf::Texture screen{};
     screen.create(CHIP8_WIDTH, CHIP8_HEIGHT);
 
-    sf::Clock clock;
-
     std::atomic<bool> exit = false;
     std::thread timer([&chip8, &exit]
     {
@@ -79,6 +79,18 @@ int main()
         }
     });
 
+    std::thread emulation([&chip8, &exit]
+    {
+        while(!exit)
+        {
+            using namespace std::chrono_literals;
+
+            tick(chip8);
+            std::this_thread::sleep_for(0.002s);
+        }
+    });
+
+    window.setFramerateLimit(60);
     while (window.isOpen())
     {
         sf::Event event{};
@@ -99,31 +111,26 @@ int main()
             }
         }
 
-        if (clock.getElapsedTime().asMilliseconds() >= 2)
+        for (int i = 0; i < CHIP8_HEIGHT; i++)
         {
-            tick(chip8);
-
-            for (int i = 0; i < CHIP8_HEIGHT; i++)
-            {
-                for (int j = 0; j < CHIP8_WIDTH; j++)
-                    graphics_buffer[i][j] = 0xffffff00u * (chip8.graphics_memory[i][j] != 0) + 0xffu;
-            }
-
-            screen.update(reinterpret_cast<uint8_t *>(graphics_buffer));
-
-            auto sprite = sf::Sprite(screen);
-            sprite.scale({10.f, 10.f});
-
-            window.clear();
-            window.draw(sprite);
-            window.display();
-
-            clock.restart();
+            for (int j = 0; j < CHIP8_WIDTH; j++)
+                graphics_buffer[i][j] = 0xffffff00u * (chip8.graphics_memory[i][j] != 0) + 0xffu;
         }
+
+        screen.update(reinterpret_cast<uint8_t *>(graphics_buffer));
+
+        sf::Sprite sprite = sf::Sprite(screen);
+        sprite.scale({10.f, 10.f});
+
+        window.clear();
+        window.draw(sprite);
+        window.display();
+
     }
 
     exit = true;
     timer.join();
+    emulation.join();
 
     return 0;
 }
