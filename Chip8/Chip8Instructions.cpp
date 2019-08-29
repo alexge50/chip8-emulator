@@ -48,7 +48,7 @@ void _2NNN(uint16_t opcode, Chip8& memory)
 {
     if(memory.stack_pointer < CHIP8_STACK_SIZE)
     {
-        memory.stack[memory.stack_pointer++] = memory.program_counter;
+        memory.stack[memory.stack_pointer++] = memory.program_counter + 2;
 
         memory.program_counter = opcode & 0xFFFu;
     }
@@ -155,9 +155,8 @@ void _8XY5(uint16_t opcode, Chip8& memory)
     uint16_t reg_x = (opcode & 0x0F00u) >> 8u;
     uint16_t reg_y = (opcode & 0x00F0u) >> 4u;
 
-    int v = memory.registers[reg_x] - memory.registers[reg_y];
-    memory.registers[0xF] = (v < CHIP8_MIN_VALUE);
-    memory.registers[reg_x] = (v + CHIP8_MAX_VALUE) & CHIP8_MAX_VALUE;
+    memory.registers[0xF] = !(memory.registers[reg_x] < memory.registers[reg_y]);
+    memory.registers[reg_x] = memory.registers[reg_x] - memory.registers[reg_y];
 
     memory.program_counter += 2;
 }
@@ -178,10 +177,8 @@ void _8XY7(uint16_t opcode, Chip8& memory)
     uint16_t reg_x = (opcode & 0x0F00u) >> 8u;
     uint16_t reg_y = (opcode & 0x00F0u) >> 4u;
 
-    int v = memory.registers[reg_y] - memory.registers[reg_x];
-    memory.registers[0xF] = (v < CHIP8_MIN_VALUE);
-    memory.registers[reg_x] = (v + CHIP8_MAX_VALUE) & CHIP8_MAX_VALUE;
-
+    memory.registers[0xF] = !(memory.registers[reg_y] < memory.registers[reg_x]);
+    memory.registers[reg_x] = memory.registers[reg_y] - memory.registers[reg_x];
     memory.program_counter += 2;
 }
 
@@ -246,7 +243,7 @@ void _DXYN(uint16_t opcode, Chip8& memory)
         for(int j = 0; j < CHIP8_SPRITE_WIDTH; j++)
             if(row & (0x80u >> static_cast<unsigned int>(j)))
             {
-                memory.registers[0xF] = memory.registers[0xF] && memory.graphics_memory[i + vy][j + vx];
+                memory.registers[0xF] = memory.registers[0xF] || memory.graphics_memory[i + vy][j + vx];
                 memory.graphics_memory[i + vy][j + vx] ^= 1u;
             }
     }
@@ -316,6 +313,7 @@ void _FX1E(uint16_t opcode, Chip8& memory)
 {
     uint16_t reg = (opcode & 0x0F00u) >> 8u;
     memory.index += memory.registers[reg];
+    memory.index &= 0x0FFFu;
 
     memory.program_counter += 2;
 }
@@ -344,8 +342,8 @@ void _FX33(uint16_t opcode, Chip8& memory)
 void _FX55(uint16_t opcode, Chip8& memory)
 {
     uint16_t reg = (opcode & 0x0F00u) >> 8u;
-    for(int i = 0; i < reg; i++)
-        memory.memory[memory.index++] = memory.registers[i];
+    for(int i = 0; i <= reg; i++)
+        memory.memory[memory.index + i] = memory.registers[i];
 
     memory.program_counter += 2;
 }
@@ -353,8 +351,8 @@ void _FX55(uint16_t opcode, Chip8& memory)
 void _FX65(uint16_t opcode, Chip8& memory)
 {
     uint16_t reg = (opcode & 0x0F00u) >> 8u;
-    for(int i = 0; i < reg; i++)
-        memory.registers[i] = memory.memory[memory.index++];
+    for(int i = 0; i <= reg; i++)
+        memory.registers[i] = memory.memory[memory.index + i];
 
     memory.program_counter += 2;
 }
