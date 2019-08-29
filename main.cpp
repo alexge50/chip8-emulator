@@ -28,6 +28,24 @@ void logMemory(const Chip8& chip8, const char* file)
     log.write(reinterpret_cast<const char*>(chip8.memory), 0xfff);
 }
 
+static const std::unordered_map<sf::Keyboard::Key, uint8_t> inputMapping = {
+        {sf::Keyboard::Num1, 0x1},
+        {sf::Keyboard::Num2, 0x2},
+        {sf::Keyboard::Num3, 0x3},
+        {sf::Keyboard::Q, 0x4},
+        {sf::Keyboard::W, 0x5},
+        {sf::Keyboard::E, 0x6},
+        {sf::Keyboard::A, 0x7},
+        {sf::Keyboard::S, 0x8},
+        {sf::Keyboard::D, 0x9},
+        {sf::Keyboard::Z, 0xa},
+        {sf::Keyboard::C, 0xb},
+        {sf::Keyboard::Num4, 0xc},
+        {sf::Keyboard::R, 0xd},
+        {sf::Keyboard::F, 0xe},
+        {sf::Keyboard::V, 0xf},
+};
+
 int main()
 {
     Chip8 chip8 = loadRom("roms/BREAKOUT.ch8");
@@ -50,6 +68,17 @@ int main()
         {
             if (event.type == sf::Event::Closed)
                 window.close();
+
+            if (event.type == sf::Event::KeyPressed)
+            {
+                if (auto it = inputMapping.find(event.key.code); it != inputMapping.end())
+                    chip8.key[it->second] = 1;
+            }
+            else if (event.type == sf::Event::KeyReleased)
+            {
+                if (auto it = inputMapping.find(event.key.code); it != inputMapping.end())
+                    chip8.key[it->second] = 0;
+            }
         }
 
         std::cout << std::hex << chip8.program_counter << std::dec << ": " << decode_next_instruction(chip8) << std::endl;
