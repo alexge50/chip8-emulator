@@ -23,6 +23,7 @@
 #include <fstream>
 #include <string_view>
 #include <vector>
+#include <atomic>
 
 #include "Chip8Instructions.h"
 
@@ -31,7 +32,7 @@ const unsigned int CHIP8_WIDTH = 64;
 const unsigned int CHIP8_HEIGHT = 32;
 const unsigned int CHIP8_MEMORY = 4096;
 const unsigned int CHIP8_REGISTERS = 16;
-const unsigned int CHIP8_STACK_SIZE = 16;
+const unsigned int CHIP8_STACK_SIZE = 24;
 const unsigned int CHIP8_KEYS = 16;
 
 const unsigned int CHIP8_FONTSET_OFFSET = 0x0; //fontset starts in memory from 0
@@ -99,7 +100,7 @@ struct Chip8
 
     uint8_t graphics_memory[CHIP8_HEIGHT][CHIP8_WIDTH] = {};
 
-    uint8_t delay_timer = {}, sound_timer = {};
+    std::atomic<uint8_t> delay_timer = {}, sound_timer = {};
 
     uint16_t stack[CHIP8_STACK_SIZE] = {};
     uint16_t stack_pointer = {};
@@ -135,17 +136,19 @@ static void tick(Chip8& chip)
             instruction.instruction_callback(opcode, chip);
 }
 
-static Chip8 loadRom(const char* filename)
+static void tick_timer(Chip8& chip)
 {
-    Chip8 chip;
+    chip.delay_timer -= chip.delay_timer != 0;
+    chip.sound_timer -= chip.sound_timer != 0;
+}
 
+static void loadRom(Chip8& chip, const char* filename)
+{
     std::copy(std::begin(font_data), std::end(font_data), chip.memory);
 
     std::ifstream romFile(filename, std::ios::binary | std::ios::in);
     romFile.rdbuf()->sgetn(reinterpret_cast<char*>(chip.memory + 0x200), 0xfff);
     chip.program_counter = 0x200;
-
-    return chip;
 }
 
 #endif //CHIP8_EMULATOR_CHIP8_H
