@@ -38,6 +38,7 @@ const unsigned int CHIP8_FONTSET_OFFSET = 0x0; //fontset starts in memory from 0
 const unsigned int CHIP8_SPRITE_WIDTH = 8;
 const unsigned int CHIP8_MAX_VALUE = 255;
 const unsigned int CHIP8_MIN_VALUE = 0;
+const unsigned int CHIP8_FONT_SPRITE_SIZE = 5;
 
 class Chip8;
 
@@ -50,7 +51,7 @@ struct InstructionEntry
 
 const InstructionEntry instructionTable[] =
 {
-        {0xF000, 0x0000, _0NNN},
+//      {0xF000, 0x0000, _0NNN},
         {0xFFFF, 0x00E0, _00E0},
         {0xFFFF, 0x00EE, _00EE},
         {0xF000, 0x1000, _1NNN},

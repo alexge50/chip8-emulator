@@ -56,7 +56,7 @@ void _2NNN(uint16_t opcode, Chip8& memory)
 
 void _3XNN(uint16_t opcode, Chip8& memory)
 {
-    uint16_t reg = opcode & 0x0F00u;
+    uint16_t reg = (opcode & 0x0F00u) >> 8u;
     uint16_t value = opcode & 0x00FFu;
 
     if(memory.registers[reg] == value)
@@ -66,7 +66,7 @@ void _3XNN(uint16_t opcode, Chip8& memory)
 
 void _4XNN(uint16_t opcode, Chip8& memory)
 {
-    uint16_t reg = opcode & 0x0F00u;
+    uint16_t reg = (opcode & 0x0F00u) >> 8u;
     uint16_t value = opcode & 0x00FFu;
 
     if(memory.registers[reg] != value)
@@ -76,8 +76,8 @@ void _4XNN(uint16_t opcode, Chip8& memory)
 
 void _5XY0(uint16_t opcode, Chip8& memory)
 {
-    uint16_t reg_x = opcode & 0x0F00u;
-    uint16_t reg_y = opcode & 0x00F0u;
+    uint16_t reg_x = (opcode & 0x0F00u) >> 8u;
+    uint16_t reg_y = (opcode & 0x00F0u) >> 4u;
 
     if(memory.registers[reg_x] == memory.registers[reg_y])
         memory.program_counter += 4;
@@ -86,26 +86,26 @@ void _5XY0(uint16_t opcode, Chip8& memory)
 
 void _6XNN(uint16_t opcode, Chip8& memory)
 {
-    uint16_t reg = opcode & 0xF00u;
+    uint16_t reg = (opcode & 0x0F00u) >> 8u;
     uint16_t value = opcode & 0x00FFu;
-    memory.registers[reg] = static_cast<uint8_t>(0xFFu & value);
+    memory.registers[reg] = static_cast<uint8_t>(value);
 
     memory.program_counter += 2;
 }
 
 void _7XNN(uint16_t opcode, Chip8& memory)
 {
-    uint16_t reg = opcode & 0xF00u;
+    uint16_t reg = (opcode & 0x0F00u) >> 8u;
     uint16_t value = opcode & 0x00FFu;
-    memory.registers[reg] += static_cast<uint8_t>(0xFFu & value);
+    memory.registers[reg] = static_cast<uint8_t>((memory.registers[reg] + value) & 0xFFu);
 
     memory.program_counter += 2;
 }
 
 void _8XY0(uint16_t opcode, Chip8& memory)
 {
-    uint16_t reg_x = opcode & 0x0F00u;
-    uint16_t reg_y = opcode & 0x00F0u;
+    uint16_t reg_x = (opcode & 0x0F00u) >> 8u;
+    uint16_t reg_y = (opcode & 0x00F0u) >> 4u;
     memory.registers[reg_x] = memory.registers[reg_y];
 
     memory.program_counter += 2;
@@ -113,8 +113,8 @@ void _8XY0(uint16_t opcode, Chip8& memory)
 
 void _8XY1(uint16_t opcode, Chip8& memory)
 {
-    uint16_t reg_x = opcode & 0x0F00u;
-    uint16_t reg_y = opcode & 0x00F0u;
+    uint16_t reg_x = (opcode & 0x0F00u) >> 8u;
+    uint16_t reg_y = (opcode & 0x00F0u) >> 4u;
     memory.registers[reg_x] |= memory.registers[reg_y];
 
     memory.program_counter += 2;
@@ -122,8 +122,8 @@ void _8XY1(uint16_t opcode, Chip8& memory)
 
 void _8XY2(uint16_t opcode, Chip8& memory)
 {
-    uint16_t reg_x = opcode & 0x0F00u;
-    uint16_t reg_y = opcode & 0x00F0u;
+    uint16_t reg_x = (opcode & 0x0F00u) >> 8u;
+    uint16_t reg_y = (opcode & 0x00F0u) >> 4u;
     memory.registers[reg_x] &= memory.registers[reg_y];
 
     memory.program_counter += 2;
@@ -131,8 +131,8 @@ void _8XY2(uint16_t opcode, Chip8& memory)
 
 void _8XY3(uint16_t opcode, Chip8& memory)
 {
-    uint16_t reg_x = opcode & 0x0F00u;
-    uint16_t reg_y = opcode & 0x00F0u;
+    uint16_t reg_x = (opcode & 0x0F00u) >> 8u;
+    uint16_t reg_y = (opcode & 0x00F0u) >> 4u;
     memory.registers[reg_x] ^= memory.registers[reg_y];
 
     memory.program_counter += 2;
@@ -140,10 +140,10 @@ void _8XY3(uint16_t opcode, Chip8& memory)
 
 void _8XY4(uint16_t opcode, Chip8& memory)
 {
-    uint16_t reg_x = opcode & 0x0F00u;
-    uint16_t reg_y = opcode & 0x00F0u;
+    uint16_t reg_x = (opcode & 0x0F00u) >> 8u;
+    uint16_t reg_y = (opcode & 0x00F0u) >> 4u;
 
-    unsigned int v = memory.registers[reg_x] + memory.memory[reg_y];
+    unsigned int v = memory.registers[reg_x] + memory.registers[reg_y];
     memory.registers[0xF] = (v > CHIP8_MAX_VALUE);
     memory.registers[reg_x] = v & CHIP8_MAX_VALUE;
 
@@ -152,10 +152,10 @@ void _8XY4(uint16_t opcode, Chip8& memory)
 
 void _8XY5(uint16_t opcode, Chip8& memory)
 {
-    uint16_t reg_x = opcode & 0x0F00u;
-    uint16_t reg_y = opcode & 0x00F0u;
+    uint16_t reg_x = (opcode & 0x0F00u) >> 8u;
+    uint16_t reg_y = (opcode & 0x00F0u) >> 4u;
 
-    unsigned int v = memory.registers[reg_x] - memory.memory[reg_y];
+    int v = memory.registers[reg_x] - memory.registers[reg_y];
     memory.registers[0xF] = (v < CHIP8_MIN_VALUE);
     memory.registers[reg_x] = (v + CHIP8_MAX_VALUE) & CHIP8_MAX_VALUE;
 
@@ -164,21 +164,21 @@ void _8XY5(uint16_t opcode, Chip8& memory)
 
 void _8XY6(uint16_t opcode, Chip8& memory)
 {
-    uint16_t reg_x = opcode & 0x0F00u;
-    uint16_t reg_y = opcode & 0x00F0u;
+    uint16_t reg_x = (opcode & 0x0F00u) >> 8u;
+    uint16_t reg_y = (opcode & 0x00F0u) >> 4u;
 
-    memory.registers[0xF] = memory.memory[reg_y] & 0b1u;
-    memory.registers[reg_x] = memory.memory[reg_y] >> 1u;
+    memory.registers[0xF] = memory.registers[reg_x] & 0b1u;
+    memory.registers[reg_x] = memory.registers[reg_x] >> 1u;
 
     memory.program_counter += 2;
 }
 
 void _8XY7(uint16_t opcode, Chip8& memory)
 {
-    uint16_t reg_x = opcode & 0x0F00u;
-    uint16_t reg_y = opcode & 0x00F0u;
+    uint16_t reg_x = (opcode & 0x0F00u) >> 8u;
+    uint16_t reg_y = (opcode & 0x00F0u) >> 4u;
 
-    unsigned int v = memory.memory[reg_y] - memory.registers[reg_x];
+    int v = memory.registers[reg_y] - memory.registers[reg_x];
     memory.registers[0xF] = (v < CHIP8_MIN_VALUE);
     memory.registers[reg_x] = (v + CHIP8_MAX_VALUE) & CHIP8_MAX_VALUE;
 
@@ -187,19 +187,19 @@ void _8XY7(uint16_t opcode, Chip8& memory)
 
 void _8XYE(uint16_t opcode, Chip8& memory)
 {
-    uint16_t reg_x = opcode & 0x0F00u;
-    uint16_t reg_y = opcode & 0x00F0u;
+    uint16_t reg_x = (opcode & 0x0F00u) >> 8u;
+    uint16_t reg_y = (opcode & 0x00F0u) >> 4u;
 
-    memory.registers[0xF] = memory.memory[reg_y] & 0b10000000u;
-    memory.registers[reg_x] = memory.memory[reg_y] << 1u;
+    memory.registers[0xF] = memory.registers[reg_x] >> 7u;
+    memory.registers[reg_x] = memory.registers[reg_x] << 1u;
 
     memory.program_counter += 2;
 }
 
 void _9XY0(uint16_t opcode, Chip8& memory)
 {
-    uint16_t reg_x = opcode & 0x0F00u;
-    uint16_t reg_y = opcode & 0x00F0u;
+    uint16_t reg_x = (opcode & 0x0F00u) >> 8u;
+    uint16_t reg_y = (opcode & 0x00F0u) >> 4u;
 
     if(memory.registers[reg_x] != memory.registers[reg_y])
         memory.program_counter += 4;
@@ -222,7 +222,7 @@ void _BNNN(uint16_t opcode, Chip8& memory)
 
 void _CXNN(uint16_t opcode, Chip8& memory)
 {
-    uint16_t reg = opcode & 0x0F00u;
+    uint16_t reg = (opcode & 0x0F00u) >> 8u;
     uint16_t value = opcode & 0x00FFu;
 
     memory.registers[reg] = rand() & value;
@@ -232,28 +232,31 @@ void _CXNN(uint16_t opcode, Chip8& memory)
 
 void _DXYN(uint16_t opcode, Chip8& memory)
 {
-    uint16_t reg_x = opcode & 0x0F00u;
-    uint16_t reg_y = opcode & 0x00F0u;
+    uint16_t reg_x = (opcode & 0x0F00u) >> 8u;
+    uint16_t reg_y = (opcode & 0x00F0u) >> 4u;
     uint16_t height = opcode & 0x000Fu;
 
     uint16_t vx = memory.registers[reg_x];
     uint16_t vy = memory.registers[reg_y];
 
+    memory.registers[0xF] = 0;
     for(int i = 0; i < height; i++)
+    {
+        uint8_t row = memory.memory[memory.index + i];
         for(int j = 0; j < CHIP8_SPRITE_WIDTH; j++)
-        {
-            int offset = i * CHIP8_SPRITE_WIDTH + j;
-
-            memory.graphics_memory[i + vy][j + vx] ^= memory.memory[memory.index + offset];
-        }
-
+            if(row & (0x80u >> static_cast<unsigned int>(j)))
+            {
+                memory.registers[0xF] = memory.registers[0xF] && memory.graphics_memory[i + vy][j + vx];
+                memory.graphics_memory[i + vy][j + vx] ^= 1u;
+            }
+    }
 
     memory.program_counter += 2;
 }
 
 void _EX9E(uint16_t opcode, Chip8& memory)
 {
-    uint16_t reg = opcode & 0x0F00u;
+    uint16_t reg = (opcode & 0x0F00u) >> 8u;
 
     if(memory.key[memory.registers[reg]])
         memory.program_counter += 4;
@@ -262,7 +265,7 @@ void _EX9E(uint16_t opcode, Chip8& memory)
 
 void _EXA1(uint16_t opcode, Chip8& memory)
 {
-    uint16_t reg = opcode & 0x0F00u;
+    uint16_t reg = (opcode & 0x0F00u) >> 8u;
 
     if(!memory.key[memory.registers[reg]])
         memory.program_counter += 4;
@@ -271,7 +274,7 @@ void _EXA1(uint16_t opcode, Chip8& memory)
 
 void _FX07(uint16_t opcode, Chip8& memory)
 {
-    uint16_t reg = opcode & 0xF00u;
+    uint16_t reg = (opcode & 0x0F00u) >> 8u;
     memory.registers[reg] = memory.delay_timer;
 
     memory.program_counter += 2;
@@ -279,7 +282,7 @@ void _FX07(uint16_t opcode, Chip8& memory)
 
 void _FX0A(uint16_t opcode, Chip8& memory)
 {
-    uint16_t reg = opcode & 0xF00u;
+    uint16_t reg = (opcode & 0x0F00u) >> 8u;
 
     int key = -1;
     for(int i = 0; i < CHIP8_KEYS; i++)
@@ -295,7 +298,7 @@ void _FX0A(uint16_t opcode, Chip8& memory)
 
 void _FX15(uint16_t opcode, Chip8& memory)
 {
-    uint16_t reg = opcode & 0xF00u;
+    uint16_t reg = (opcode & 0x0F00u) >> 8u;
     memory.delay_timer = memory.registers[reg];
 
     memory.program_counter += 2;
@@ -303,7 +306,7 @@ void _FX15(uint16_t opcode, Chip8& memory)
 
 void _FX18(uint16_t opcode, Chip8& memory)
 {
-    uint16_t reg = opcode & 0xF00u;
+    uint16_t reg = (opcode & 0x0F00u) >> 8u;
     memory.sound_timer = memory.registers[reg];
 
     memory.program_counter += 2;
@@ -311,7 +314,7 @@ void _FX18(uint16_t opcode, Chip8& memory)
 
 void _FX1E(uint16_t opcode, Chip8& memory)
 {
-    uint16_t reg = opcode & 0xF00u;
+    uint16_t reg = (opcode & 0x0F00u) >> 8u;
     memory.index += memory.registers[reg];
 
     memory.program_counter += 2;
@@ -319,15 +322,15 @@ void _FX1E(uint16_t opcode, Chip8& memory)
 
 void _FX29(uint16_t opcode, Chip8& memory)
 {
-    uint16_t reg = opcode & 0xF00u;
-    memory.index = static_cast<uint16_t>(CHIP8_FONTSET_OFFSET + memory.registers[reg] & 0xF);
+    uint16_t reg = (opcode & 0x0F00u) >> 8u;
+    memory.index = static_cast<uint16_t>(CHIP8_FONTSET_OFFSET + (memory.registers[reg] & 0xF) * CHIP8_FONT_SPRITE_SIZE);
 
     memory.program_counter += 2;
 }
 
 void _FX33(uint16_t opcode, Chip8& memory)
 {
-    uint8_t value = memory.registers[opcode & 0x0F00u];
+    uint8_t value = memory.registers[(opcode & 0x0F00u) >> 8u];
 
     for(int i = 2; i >= 0; i--)
     {
@@ -340,7 +343,7 @@ void _FX33(uint16_t opcode, Chip8& memory)
 
 void _FX55(uint16_t opcode, Chip8& memory)
 {
-    uint16_t reg = 0x0F00u & opcode;
+    uint16_t reg = (opcode & 0x0F00u) >> 8u;
     for(int i = 0; i < reg; i++)
         memory.memory[memory.index++] = memory.registers[i];
 
@@ -349,7 +352,7 @@ void _FX55(uint16_t opcode, Chip8& memory)
 
 void _FX65(uint16_t opcode, Chip8& memory)
 {
-    uint16_t reg = 0x0F00u & opcode;
+    uint16_t reg = (opcode & 0x0F00u) >> 8u;
     for(int i = 0; i < reg; i++)
         memory.registers[i] = memory.memory[memory.index++];
 
