@@ -25,8 +25,6 @@
 #include <vector>
 #include <atomic>
 
-#include <emmintrin.h>
-
 #include "Chip8Instructions.h"
 
 const unsigned int CHIP8_NUMBER_OPCODES = 35;
@@ -210,27 +208,34 @@ static void tick(Chip8& chip)
 {
     uint16_t opcode = (chip.memory[chip.program_counter] << 8u) + chip.memory[chip.program_counter + 1];
 
-    auto opcodes =  _mm_set1_epi16(opcode);
+    constexpr struct {
+        int start, end;
+    } ends[] =
+            {
+                    {0, 1},   //0x0
+                    {2, 2},   //0x1
+                    {3, 3},   //0x2
+                    {4, 4},   //0x3
+                    {5, 5},   //0x4
+                    {6, 6},   //0x5
+                    {7, 7},   //0x6
+                    {8, 8},   //0x7
+                    {9, 17},  //0x8
+                    {18, 18}, //0x9
+                    {19, 19}, //0xA
+                    {20, 20}, //0xB
+                    {21, 21}, //0xC
+                    {22, 22}, //0xD
+                    {23, 24}, //0xE
+                    {25, 33}, //0xF
+            };
+    auto high = static_cast<uint8_t>(opcode >> 12u);
 
-    for(int i = 0; i < 4; i++)
-    {
-        __m128i r = _mm_and_si128(*(__m128i*)(instructionMasks + i * 8), opcodes);
-        r = _mm_cmpeq_epi16(r, *(__m128i*)(instructionValues + i * 8));
-        int x = _mm_movemask_epi8(r);
-
-        if(x != 0)
-        {
-            instructionTable[i * 8 + __builtin_ctz(x) / 2].instruction_callback(opcode, chip);
-            return;
-        }
-
-    }
-
-    for(int i = 32; i < 34; i++)
-        if((opcode & instructionMasks[i]) == instructionValues[i])
+    for(int i = ends[high].start; i <= ends[high].end; i++)
+        if((opcode & instructionTable[i].mask) == instructionTable[i].value)
         {
             instructionTable[i].instruction_callback(opcode, chip);
-            return;
+            return ;
         }
 }
 
