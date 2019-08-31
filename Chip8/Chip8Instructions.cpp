@@ -18,6 +18,8 @@
 
 #include "Chip8.h"
 
+#include <cstring>
+
 void _0NNN(uint16_t opcode, Chip8& memory)
 {
     //TODO
@@ -25,9 +27,9 @@ void _0NNN(uint16_t opcode, Chip8& memory)
 
 void _00E0(uint16_t opcode, Chip8& memory)
 {
-    for(int i = 0; i < CHIP8_HEIGHT; i++)
-        for(int j = 0; j < CHIP8_WIDTH; j++)
-            memory.graphics_memory[i][j] = 0;
+    graphics_lock(memory);
+    std::memset(memory.graphics_memory[memory.graphics_memory_id], 0, sizeof(uint8_t) * CHIP8_HEIGHT * CHIP8_WIDTH);
+    graphics_unlock(memory);
 
     memory.program_counter += 2;
 }
@@ -229,6 +231,8 @@ void _CXNN(uint16_t opcode, Chip8& memory)
 
 void _DXYN(uint16_t opcode, Chip8& memory)
 {
+    graphics_lock(memory);
+
     uint16_t reg_x = (opcode & 0x0F00u) >> 8u;
     uint16_t reg_y = (opcode & 0x00F0u) >> 4u;
     uint16_t height = opcode & 0x000Fu;
@@ -237,16 +241,21 @@ void _DXYN(uint16_t opcode, Chip8& memory)
     uint16_t vy = memory.registers[reg_y];
 
     memory.registers[0xF] = 0;
+
+    int id = memory.graphics_memory_id;
+
     for(int i = 0; i < height; i++)
     {
         uint8_t row = memory.memory[memory.index + i];
         for(int j = 0; j < CHIP8_SPRITE_WIDTH; j++)
             if(row & (0x80u >> static_cast<unsigned int>(j)))
             {
-                memory.registers[0xF] = memory.registers[0xF] || memory.graphics_memory[i + vy][j + vx];
-                memory.graphics_memory[i + vy][j + vx] ^= 1u;
+                auto& pixel = memory.graphics_memory[id][(i + vy) % CHIP8_HEIGHT][(j + vx) % CHIP8_WIDTH];
+                memory.registers[0xF] = memory.registers[0xF] || pixel;
+                pixel ^= 1u;
             }
     }
+    graphics_unlock(memory);
 
     memory.program_counter += 2;
 }

@@ -111,10 +111,22 @@ int main()
             }
         }
 
+        graphics_lock(chip8);
+        int id = 1 - chip8.graphics_memory_id;
+
+        std::copy(
+                &chip8.graphics_memory[1 - id][0][0],
+                &chip8.graphics_memory[1 - id][CHIP8_HEIGHT - 1][CHIP8_WIDTH - 1] + 1,
+                &chip8.graphics_memory[id][0][0]
+        );
+
+        chip8.graphics_memory_id = id;
+        graphics_unlock(chip8);
+
         for (int i = 0; i < CHIP8_HEIGHT; i++)
         {
             for (int j = 0; j < CHIP8_WIDTH; j++)
-                graphics_buffer[i][j] = 0xffffff00u * (chip8.graphics_memory[i][j] != 0) + 0xffu;
+                graphics_buffer[i][j] = 0xffffff00u * (chip8.graphics_memory[1 - id][i][j] != 0) + 0xffu;
         }
 
         screen.update(reinterpret_cast<uint8_t *>(graphics_buffer));

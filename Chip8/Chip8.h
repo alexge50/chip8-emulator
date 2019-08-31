@@ -175,7 +175,9 @@ struct Chip8
 
     uint16_t index = {}, program_counter = {};
 
-    uint8_t graphics_memory[CHIP8_HEIGHT][CHIP8_WIDTH] = {};
+    uint8_t graphics_memory[2][CHIP8_HEIGHT][CHIP8_WIDTH] = {};
+    std::atomic<int> graphics_memory_id = 0;
+    std::atomic_flag graphics_memory_locked = ATOMIC_FLAG_INIT;
 
     std::atomic<uint8_t> delay_timer = {}, sound_timer = {};
 
@@ -243,6 +245,17 @@ static void tick_timer(Chip8& chip)
 {
     chip.delay_timer -= chip.delay_timer != 0;
     chip.sound_timer -= chip.sound_timer != 0;
+}
+
+static void graphics_lock(Chip8& chip)
+{
+    while(chip.graphics_memory_locked.test_and_set(std::memory_order_acquire))
+        ;
+}
+
+static void graphics_unlock(Chip8& chip)
+{
+    chip.graphics_memory_locked.clear(std::memory_order_release);
 }
 
 static void loadRom(Chip8& chip, const char* filename)
