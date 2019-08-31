@@ -85,8 +85,10 @@ int main()
         {
             using namespace std::chrono_literals;
 
+            auto start = std::chrono::system_clock::now();
             tick(chip8);
-            std::this_thread::sleep_for(0.002s);
+            auto end = std::chrono::system_clock::now();
+            std::this_thread::sleep_for(0.002s - (end - start));
         }
     });
 
